@@ -72,7 +72,17 @@ public class CarritoService {
                     .sum();
     }
 
-    // 4. Checkout
+    // 4. Vaciar carrito
+    public String vaciarCarrito(Long usuarioId) {
+        List<CarritoItem> items = carritoRepository.findByUsuarioId(usuarioId);
+        if (items.isEmpty()) {
+            throw new OperacionInvalidaException("El carrito ya está vacío");
+        }
+        carritoRepository.deleteAll(items);
+        return "Carrito vaciado correctamente";
+    }
+
+    // 5. Checkout
     @Transactional
     public String realizarCheckout(Long usuarioId) {
         List<CarritoItem> items = carritoRepository.findByUsuarioId(usuarioId);

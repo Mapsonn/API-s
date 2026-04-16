@@ -2,8 +2,10 @@ package com.uade.tpo.e_commerce1.service;
 
 import com.uade.tpo.e_commerce1.dto.ProductoRequestDTO;
 import com.uade.tpo.e_commerce1.dto.ProductoResponseDTO;
+import com.uade.tpo.e_commerce1.exception.OperacionInvalidaException;
 import com.uade.tpo.e_commerce1.exception.RecursoNotFoundException;
 import com.uade.tpo.e_commerce1.model.Categoria;
+import com.uade.tpo.e_commerce1.model.ImagenProducto;
 import com.uade.tpo.e_commerce1.model.Producto;
 import com.uade.tpo.e_commerce1.model.Usuario;
 import com.uade.tpo.e_commerce1.repository.CategoriaRepository;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,8 +30,8 @@ public class ProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
-    
-    @Autowired 
+
+    @Autowired
     private CategoriaRepository categoriaRepository;
 
     @Autowired
@@ -36,7 +39,7 @@ public class ProductoService {
 
     private final String DIRECTORIO_IMAGENES = "imagenes";
 
-    // --- MÉTODOS DE CONSULTA (Retornan DTO) ---
+    // --- MÉTODOS DE CONSULTA ---
 
     public List<ProductoResponseDTO> obtenerTodosOrdenadosDTO() {
         return productoRepository.findAllByOrderByNombreAsc()
@@ -54,7 +57,7 @@ public class ProductoService {
 
     public ProductoResponseDTO buscarPorIdDTO(Long id) {
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new RecursoNotFoundException("Producto no encontrado con ID: " + id));
         return mapToResponseDTO(producto);
     }
 
@@ -65,10 +68,10 @@ public class ProductoService {
                 .collect(Collectors.toList());
     }
 
-    // --- MÉTODOS DE PERSISTENCIA (Usan RequestDTO) ---
+    // --- MÉTODOS DE PERSISTENCIA ---
 
     @Transactional
-    public ProductoResponseDTO guardarConDTO(ProductoRequestDTO request, MultipartFile imagen) {
+    public ProductoResponseDTO guardarConDTO(ProductoRequestDTO request, List<MultipartFile> imagenes) {
         Categoria cat = categoriaRepository.findById(request.getCategoriaId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
@@ -78,11 +81,18 @@ public class ProductoService {
         Producto producto = new Producto();
         updateEntityFromDTO(producto, request, cat, user);
 
-        if (imagen != null && !imagen.isEmpty()) {
-            try {
-                producto.setImagenUrl(procesarImagen(imagen));
-            } catch (IOException e) {
-                throw new RuntimeException("Error al procesar la imagen");
+        if (imagenes != null) {
+            for (MultipartFile img : imagenes) {
+                if (img != null && !img.isEmpty()) {
+                    try {
+                        ImagenProducto imgEntity = new ImagenProducto();
+                        imgEntity.setUrl(procesarImagen(img));
+                        imgEntity.setProducto(producto);
+                        producto.getImagenes().add(imgEntity);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error al procesar la imagen");
+                    }
+                }
             }
         }
 
@@ -90,42 +100,52 @@ public class ProductoService {
     }
 
     @Transactional
-    public ProductoResponseDTO actualizarConDTO(Long id, ProductoRequestDTO request, MultipartFile imagen) {
+    public ProductoResponseDTO actualizarConDTO(Long id, ProductoRequestDTO request, List<MultipartFile> imagenes) {
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new RecursoNotFoundException("Producto no encontrado con ID: " + id));
+
+        if (!producto.getUsuario().getId().equals(request.getUsuarioId())) {
+            throw new OperacionInvalidaException("No tienes permiso para modificar este producto");
+        }
 
         Categoria cat = categoriaRepository.findById(request.getCategoriaId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
-        
+
         Usuario user = usuarioRepository.findById(request.getUsuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         updateEntityFromDTO(producto, request, cat, user);
 
-        if (imagen != null && !imagen.isEmpty()) {
-            try {
-                producto.setImagenUrl(procesarImagen(imagen));
-            } catch (IOException e) {
-                throw new RuntimeException("Error al actualizar la imagen");
+        if (imagenes != null && !imagenes.isEmpty()) {
+            producto.getImagenes().clear();
+            for (MultipartFile img : imagenes) {
+                if (img != null && !img.isEmpty()) {
+                    try {
+                        ImagenProducto imgEntity = new ImagenProducto();
+                        imgEntity.setUrl(procesarImagen(img));
+                        imgEntity.setProducto(producto);
+                        producto.getImagenes().add(imgEntity);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error al actualizar la imagen");
+                    }
+                }
             }
         }
 
         return mapToResponseDTO(productoRepository.save(producto));
     }
 
-    public String eliminar(Long id) {
-        if (productoRepository.existsById(id)) {
-            productoRepository.deleteById(id);
-            return "Producto eliminado exitosamente";
+    public String eliminar(Long id, Long usuarioId) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNotFoundException("Producto no encontrado con ID: " + id));
+        if (!producto.getUsuario().getId().equals(usuarioId)) {
+            throw new OperacionInvalidaException("No tienes permiso para eliminar este producto");
         }
-        return "Error: No existe un producto con el ID " + id;
+        productoRepository.deleteById(id);
+        return "Producto eliminado exitosamente";
     }
 
-    // --- LÓGICA DE MAPEO (Privada) --- Funcion adicional
-    //La lógica de mapeo es un proceso de traducción que transforma los objetos 
-    //de la base de datos en mensajes más simples y seguros. 
-    //Su función es filtrar la información para que el usuario reciba solo los datos que necesita, 
-    //ocultando detalles internos sensibles y evitando errores técnicos que podrían tildar el servidor.    
+    // --- LÓGICA DE MAPEO ---
 
     private void updateEntityFromDTO(Producto p, ProductoRequestDTO dto, Categoria cat, Usuario user) {
         p.setNombre(dto.getNombre());
@@ -143,29 +163,32 @@ public class ProductoService {
         dto.setDescripcion(p.getDescripcion());
         dto.setPrecio(p.getPrecio());
         dto.setStock(p.getStock());
-        dto.setImagenUrl(p.getImagenUrl());
-        
-        // Aplanamos las relaciones para el Response
+
+        List<String> urls = p.getImagenes().stream()
+                .map(ImagenProducto::getUrl)
+                .collect(Collectors.toList());
+        dto.setImagenesUrl(urls);
+
         if (p.getCategoria() != null) {
             dto.setNombreCategoria(p.getCategoria().getNombreCategoria());
         }
         if (p.getUsuario() != null) {
             dto.setNombreVendedor(p.getUsuario().getNombre() + " " + p.getUsuario().getApellido());
         }
-        
+
         return dto;
     }
 
     @Transactional
     public boolean validarYDescontarStock(Long id, Integer cantidadSolicitada) {
         Producto p = productoRepository.findById(id)
-            .orElseThrow(() -> new RecursoNotFoundException("Producto no encontrado con ID: " + id));
+                .orElseThrow(() -> new RecursoNotFoundException("Producto no encontrado con ID: " + id));
 
         if (p.getStock() < cantidadSolicitada) {
-            return false; 
+            return false;
         }
 
-        p.setStock(p.getStock() - cantidadSolicitada); 
+        p.setStock(p.getStock() - cantidadSolicitada);
         productoRepository.save(p);
         return true;
     }
@@ -174,7 +197,7 @@ public class ProductoService {
     public void procesarCheckout(List<CheckoutItem> items) {
         for (CheckoutItem item : items) {
             Producto p = productoRepository.findById(item.getId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
             if (p.getStock() < item.getCantidad()) {
                 throw new RuntimeException("Stock insuficiente para: " + p.getNombre());
@@ -188,7 +211,7 @@ public class ProductoService {
     private String procesarImagen(MultipartFile imagen) throws IOException {
         Path directorioPath = Paths.get(DIRECTORIO_IMAGENES);
         if (!Files.exists(directorioPath)) Files.createDirectories(directorioPath);
-        
+
         String nombreArchivo = UUID.randomUUID().toString() + "_" + imagen.getOriginalFilename();
         Path rutaArchivo = directorioPath.resolve(nombreArchivo);
         Files.copy(imagen.getInputStream(), rutaArchivo);

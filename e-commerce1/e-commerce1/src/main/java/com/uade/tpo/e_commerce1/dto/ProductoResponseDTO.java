@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,9 +15,8 @@ public class ProductoResponseDTO {
     private String descripcion;
     private Double precio;
     private Integer stock;
-    private String imagenUrl;
-    
-    // Datos simplificados para la vista
-    private String nombreCategoria; 
+    private List<String> imagenesUrl;
+
+    private String nombreCategoria;
     private String nombreVendedor;
 }

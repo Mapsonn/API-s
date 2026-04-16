@@ -35,11 +35,18 @@ public class CarritoController {
         return carritoService.calcularTotal(usuarioId);
     }
 
-    //4. Checkout
+    //4. Vaciar carrito completo
+    //URL http://localhost:8080/api/carrito/vaciar/1 (Metodo DELETE en Postman)
+    @DeleteMapping("/vaciar/{usuarioId}")
+    public String vaciar(@PathVariable Long usuarioId) {
+        return carritoService.vaciarCarrito(usuarioId);
+    }
+
+    //5. Checkout
     // URL http://localhost:8080/api/carrito/checkout/1 (Metodo POST en Postman)
     @PostMapping("/checkout/{usuarioId}")
     public String realizarCompra(@PathVariable Long usuarioId) {
         return carritoService.realizarCheckout(usuarioId);
     }
-    
+
 }
