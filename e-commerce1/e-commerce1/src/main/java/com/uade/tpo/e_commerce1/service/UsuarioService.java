@@ -29,12 +29,6 @@ public class UsuarioService {
         return usuarioRepository.save(nuevoUsuario);
     }
 
-    public Usuario login(String username, String password) {
-        return usuarioRepository.findByUsername(username)
-                .filter(u -> u.getPassword().equals(password))
-                .orElseThrow(() -> new RuntimeException("Usuario o contraseña incorrectos"));
-    }
-
     public String eliminar(Long id) {
         if (usuarioRepository.existsById(id)) {
             usuarioRepository.deleteById(id);
