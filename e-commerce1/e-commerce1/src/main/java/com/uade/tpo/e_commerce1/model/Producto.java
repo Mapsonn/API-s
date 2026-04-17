@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity // Esto le avisa a Spring que Producto será una tabla en SQL
+@Data   // Creacion de getters y setters con Lombok
+@AllArgsConstructor // Crea un constructor con todos los atributos
+@NoArgsConstructor  // Crea un constructor vacío (obligatorio para JPA)
 public class Producto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Marca este campo como la llave primaria
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo
     private Long id;
 
     @NotBlank(message = "El nombre no puede ser nulo o vacío")
@@ -34,16 +34,18 @@ public class Producto {
     private Integer stock;
     private String descripcion;
 
-    @ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @ManyToOne // Muchos productos pertenecen a una misma categoría
+    @JoinColumn(name = "categoria_id") // Nombre de la columna en la tabla SQL
     @NotNull(message = "La categoría es obligatoria")
     private Categoria categoria;
-
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ImagenProducto> imagenes = new ArrayList<>();
+    
+    @ElementCollection
+    @CollectionTable(name = "producto_imagenes", joinColumns = @JoinColumn(name = "producto_id"))
+    @Column(name = "imagen_url")
+    private List<String> imagenes = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnoreProperties({"password", "productos"})
-    private Usuario usuario;
+    @JsonIgnoreProperties({"password", "productos"}) 
+    private Usuario usuario; // El dueño del producto
 }

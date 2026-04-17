@@ -11,17 +11,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173") 
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
 
     @Autowired
-    private ProductoService productoService;
+    private ProductoService productoService; 
 
+    // Obtener todos - Devuelve lista de ResponseDTO
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> getAllProductos() {
-        return ResponseEntity.ok(productoService.obtenerTodosOrdenadosDTO());
+        return ResponseEntity.ok(productoService.obtenerTodosOrdenadosDTO()); 
     }
 
     @GetMapping("/buscar")
@@ -35,17 +36,17 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> getProductoById(@PathVariable Long id) {
+    public ResponseEntity<ProductoResponseDTO> getProductoById(@PathVariable Long id) { 
         return ResponseEntity.ok(productoService.buscarPorIdDTO(id));
     }
 
-    // usuarioId requerido para validar que el dueño es quien elimina
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProductoById(@PathVariable Long id, @RequestParam Long usuarioId) {
-        return ResponseEntity.ok(productoService.eliminar(id, usuarioId));
+    public ResponseEntity<String> deleteProductoById(@PathVariable Long id) {
+        return ResponseEntity.ok(productoService.eliminar(id));
     }
 
-    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    // Actualizar - Recibe RequestDTO + Imágenes opcionales
+    @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
     public ResponseEntity<ProductoResponseDTO> updateProducto(
             @PathVariable Long id,
             @ModelAttribute ProductoRequestDTO requestDTO,
@@ -60,7 +61,8 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.obtenerPorCategoriaDTO(categoriaId));
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    // Crear - Recibe RequestDTO + una o más imágenes
+    @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<ProductoResponseDTO> crearProducto(
             @ModelAttribute ProductoRequestDTO requestDTO,
             @RequestParam("imagenes") List<MultipartFile> imagenes) {
@@ -69,9 +71,4 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
     }
 
-    @PostMapping("/checkout")
-    public ResponseEntity<String> finalizarCompra(@RequestBody List<ProductoService.CheckoutItem> items) {
-        productoService.procesarCheckout(items);
-        return ResponseEntity.ok("Compra realizada con éxito");
-    }
 }

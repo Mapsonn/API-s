@@ -15,30 +15,32 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Data
-@Builder // Útil para crear usuarios en el AuthService
-@NoArgsConstructor  
-@AllArgsConstructor 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "usuarios")
-public class Usuario implements UserDetails { // IMPLEMENTAMOS LA INTERFAZ
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "El nombre de usuario no puede ser nulo")
-    @Column(unique = true, nullable = false) 
+    @Column(unique = true, nullable = false)
     private String username;
 
+    @JsonIgnore
     @NotBlank(message = "La contraseña no puede ser nula")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = "La contraseña debe contener al menos un carácter especial")
-    private String password; 
+    private String password;
 
     @NotBlank(message = "El mail es obligatorio")
     @Email(message = "Formato de mail inválido")
@@ -51,20 +53,13 @@ public class Usuario implements UserDetails { // IMPLEMENTAMOS LA INTERFAZ
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "usuario_roles",
-        joinColumns = @JoinColumn(name = "usuario_id"),
-        inverseJoinColumns = @JoinColumn(name = "rol_id")
-    )
-    private List<Rol> roles;
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre()))
-                .collect(Collectors.toList());
+        return List.of(new SimpleGrantedAuthority("ROLE_" + (role != null ? role.name() : "USER")));
     }
 
     @Override
@@ -74,26 +69,18 @@ public class Usuario implements UserDetails { // IMPLEMENTAMOS LA INTERFAZ
 
     @Override
     public String getUsername() {
-        return email; 
+        return email;
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true; 
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true; 
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true; 
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true; 
-    }
+    public boolean isEnabled() { return true; }
 }

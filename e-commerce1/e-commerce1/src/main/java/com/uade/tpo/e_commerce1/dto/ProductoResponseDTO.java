@@ -17,6 +17,8 @@ public class ProductoResponseDTO {
     private Integer stock;
     private List<String> imagenesUrl;
 
+    // Datos simplificados para la vista
+    private Long usuarioId;
     private String nombreCategoria;
     private String nombreVendedor;
 }
