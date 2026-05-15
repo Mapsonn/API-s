@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"C:\\\\Users\\\\aleja\\\\OneDrive\\\\Escritorio\\\\Uade\\\\Tercer año\\\\API\" -name \"pom.xml\" -type f 2>/dev/null | head -5)",
+      "Read(//c/Users/aleja/OneDrive/Escritorio/Uade/Tercer año/API/**)"
+    ]
+  }
+}

@@ -1,0 +1,847 @@
+{
+  "info": {
+    "name": "ECommerce1 - Full API",
+    "_postman_id": "a46eb32f-7f3e-487f-9fbc-a7fd2a75aa22",
+    "description": "Coleccion para testear todos los endpoints de la API e-commerce1.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Status code is not 5xx', function () {",
+          "  pm.expect(pm.response.code).to.be.below(500);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"email\": \"juan.perez@example.com\",\n  \"username\": \"juanp\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Save JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const token = pm.response.text().trim().replace(/^\\\"|\\\"$/g, '');",
+                  "pm.collectionVariables.set('jwtToken', token);",
+                  "pm.test('JWT token was saved', function () {",
+                  "  pm.expect(pm.collectionVariables.get('jwtToken')).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@mail.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Get All Productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/productos",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Producto por Nombre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/productos/buscar?nombre={{nombreProducto}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "nombre",
+                  "value": "{{nombreProducto}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Producto Destacado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/productos/destacado",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "destacado"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Producto by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/productos/{{productoId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Productos by Categoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/productos/categoria/{{categoriaId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "categoria",
+                "{{categoriaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Producto (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nombre",
+                  "value": "Producto nuevo",
+                  "type": "text"
+                },
+                {
+                  "key": "descripcion",
+                  "value": "Descripcion del producto",
+                  "type": "text"
+                },
+                {
+                  "key": "precio",
+                  "value": "12345",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "20",
+                  "type": "text"
+                },
+                {
+                  "key": "categoriaId",
+                  "value": "{{categoriaId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "usuarioId",
+                  "value": "{{usuarioId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "imagenes",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/productos",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Producto (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nombre",
+                  "value": "Producto actualizado",
+                  "type": "text"
+                },
+                {
+                  "key": "descripcion",
+                  "value": "Nueva descripcion",
+                  "type": "text"
+                },
+                {
+                  "key": "precio",
+                  "value": "9999",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "15",
+                  "type": "text"
+                },
+                {
+                  "key": "categoriaId",
+                  "value": "{{categoriaId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "usuarioId",
+                  "value": "{{usuarioId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "imagenes",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/productos/{{productoId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Producto",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/productos/{{productoId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Get All Categorias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/categorias",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Categoria by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/categorias/{{categoriaId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "{{categoriaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCategoria\": \"Accesorios\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/categorias",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoria",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/categorias/{{categoriaId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "{{categoriaId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carrito",
+      "item": [
+        {
+          "name": "Agregar al Carrito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/carrito/agregar?usuarioId={{usuarioId}}&productoId={{productoId}}&cantidad={{cantidad}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "carrito",
+                "agregar"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{usuarioId}}"
+                },
+                {
+                  "key": "productoId",
+                  "value": "{{productoId}}"
+                },
+                {
+                  "key": "cantidad",
+                  "value": "{{cantidad}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver Total Carrito",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/carrito/total/{{usuarioId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "carrito",
+                "total",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/carrito/checkout/{{usuarioId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "carrito",
+                "checkout",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Item del Carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/carrito/eliminar/{{itemId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "carrito",
+                "eliminar",
+                "{{itemId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vaciar Carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/carrito/vaciar/{{usuarioId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "carrito",
+                "vaciar",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Imagenes",
+      "item": [
+        {
+          "name": "Subir Imagen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/imagenes/subir",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "imagenes",
+                "subir"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Get All Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/usuarios",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Usuario by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/usuarios/{{usuarioId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"userdemo\",\n  \"password\": \"Password123!\",\n  \"email\": \"userdemo@example.com\",\n  \"nombre\": \"User\",\n  \"apellido\": \"Demo\",\n  \"role\": \"USER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/usuarios",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/usuarios/{{usuarioId}}",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Usuarios Login (custom endpoint)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/usuarios/login",
+              "host": [
+                "http://localhost:8080"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "jwtToken",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    },
+    {
+      "key": "productoId",
+      "value": "1"
+    },
+    {
+      "key": "categoriaId",
+      "value": "1"
+    },
+    {
+      "key": "itemId",
+      "value": "1"
+    },
+    {
+      "key": "cantidad",
+      "value": "1"
+    },
+    {
+      "key": "nombreProducto",
+      "value": "Zapatillas"
+    }
+  ]
+}
