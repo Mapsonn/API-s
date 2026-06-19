@@ -10,7 +10,7 @@ import store, { persistor } from './store/store.js'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+      <PersistGate loading={<div>Cargando...</div>} persistor={persistor}>
         <BrowserRouter>
           <App />
         </BrowserRouter>

@@ -8,7 +8,13 @@ import {
 // Mitiga XSS vs localStorage: no persiste entre pestañas ni sesiones.
 // La solución definitiva sería httpOnly cookies en el backend
 // (JS no puede leerlas en absoluto), pero requiere cambios en Spring Boot.
-import storageSession from 'redux-persist/lib/storage/session';
+// Storage engine manual usando sessionStorage nativo del browser
+// (evita problemas de compatibilidad con el import de redux-persist)
+const sessionStorageEngine = {
+  getItem:    (key)        => Promise.resolve(sessionStorage.getItem(key)),
+  setItem:    (key, value) => Promise.resolve(sessionStorage.setItem(key, value)),
+  removeItem: (key)        => Promise.resolve(sessionStorage.removeItem(key)),
+};
 
 import authReducer from './authSlice';
 import carritoReducer from './carritoSlice';
@@ -20,7 +26,7 @@ import { ecommerceApi } from './api/ecommerceApi';
 
 const authPersistConfig = {
   key: 'auth',
-  storage: storageSession,
+  storage: sessionStorageEngine,
   whitelist: ['token', 'usuario', 'isAuthenticated'],
 };
 
