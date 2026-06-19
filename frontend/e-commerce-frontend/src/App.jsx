@@ -1,4 +1,7 @@
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
+import { fetchCarrito } from './store/carritoSlice'
 import Navbar from './components/navbar'
 import Home2 from './pages/Home2'
 import Carrito from './pages/Carrito'
@@ -13,6 +16,17 @@ import Perfil from './pages/Perfil'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
+  const dispatch = useDispatch()
+  const usuario = useSelector((state) => state.auth.usuario)
+
+  // Al cargar la app (o hacer F5), si el usuario ya está autenticado
+  // (restaurado por redux-persist), carga su carrito desde la BD
+  useEffect(() => {
+    if (usuario?.id) {
+      dispatch(fetchCarrito(usuario.id))
+    }
+  }, [usuario?.id, dispatch])
+
   return (
     <div style={{ backgroundColor: '#efefef', minHeight: '100vh', width: '100%', margin: 0, padding: 0 }}>
       <Navbar />
