@@ -4,12 +4,9 @@ import {
   persistReducer,
   FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
 } from 'redux-persist';
+
 // sessionStorage: sobrevive F5 pero se borra al cerrar la pestaña.
 // Mitiga XSS vs localStorage: no persiste entre pestañas ni sesiones.
-// La solución definitiva sería httpOnly cookies en el backend
-// (JS no puede leerlas en absoluto), pero requiere cambios en Spring Boot.
-// Storage engine manual usando sessionStorage nativo del browser
-// (evita problemas de compatibilidad con el import de redux-persist)
 const sessionStorageEngine = {
   getItem:    (key)        => Promise.resolve(sessionStorage.getItem(key)),
   setItem:    (key, value) => Promise.resolve(sessionStorage.setItem(key, value)),
@@ -30,11 +27,23 @@ const authPersistConfig = {
   whitelist: ['token', 'usuario', 'isAuthenticated'],
 };
 
+const carritoPersistConfig = {
+  key: 'carrito',
+  storage: sessionStorageEngine,
+  whitelist: ['items'],
+};
+
+const favoritosPersistConfig = {
+  key: 'favoritos',
+  storage: sessionStorageEngine,
+  whitelist: ['items'],
+};
+
 const store = configureStore({
   reducer: {
-    auth: persistReducer(authPersistConfig, authReducer),
-    carrito: carritoReducer,
-    favoritos: favoritosReducer,
+    auth:      persistReducer(authPersistConfig,      authReducer),
+    carrito:   persistReducer(carritoPersistConfig,   carritoReducer),
+    favoritos: persistReducer(favoritosPersistConfig, favoritosReducer),
     ui: uiReducer,
     perfil: perfilReducer,
     ordenes: ordenesReducer,
@@ -42,7 +51,6 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      // redux-persist usa acciones no serializables internamente
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },

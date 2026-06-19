@@ -1,24 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const cargarFavoritos = () => {
-  try {
-    const guardados = localStorage.getItem('favoriteItems');
-    return guardados ? JSON.parse(guardados) : [];
-  } catch {
-    return [];
-  }
-};
-
+// El estado inicial es vacío — redux-persist rehidrata desde sessionStorage al hacer F5
 const favoritosSlice = createSlice({
   name: 'favoritos',
   initialState: {
-    items: cargarFavoritos(),
+    items: [],
   },
   reducers: {
     agregarAFavoritos: (state, action) => {
       const producto = action.payload;
       const existe = state.items.some((item) => item.id === producto.id);
-
       if (!existe) {
         state.items.push(producto);
       }
@@ -35,5 +26,4 @@ const favoritosSlice = createSlice({
 });
 
 export const { agregarAFavoritos, eliminarDeFavoritos, limpiarFavoritos } = favoritosSlice.actions;
-
 export default favoritosSlice.reducer;
