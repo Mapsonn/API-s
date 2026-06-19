@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/navbar'
 import Home2 from './pages/Home2'
 import Carrito from './pages/Carrito'
-import Login from './pages/Login'
+import LoginJWT from './pages/LoginJWT'
 import Registro from './pages/Registro'
 import DetallleProducto from './pages/DetallleProducto'
 import Favorite from './pages/Favorite'
@@ -69,7 +69,7 @@ function App() {
           />
 
           <Route path="/registro" element={<Registro />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<LoginJWT />} />
         </Routes>
       </main>
     </div>

@@ -1,4 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
+} from 'redux-persist';
+// sessionStorage: sobrevive F5 pero se borra al cerrar la pestaña.
+// Mitiga XSS vs localStorage: no persiste entre pestañas ni sesiones.
+// La solución definitiva sería httpOnly cookies en el backend
+// (JS no puede leerlas en absoluto), pero requiere cambios en Spring Boot.
+import storageSession from 'redux-persist/lib/storage/session';
+
 import authReducer from './authSlice';
 import carritoReducer from './carritoSlice';
 import favoritosReducer from './favoritosSlice';
@@ -7,9 +18,15 @@ import perfilReducer from './perfilSlice';
 import ordenesReducer from './ordenesSlice';
 import { ecommerceApi } from './api/ecommerceApi';
 
+const authPersistConfig = {
+  key: 'auth',
+  storage: storageSession,
+  whitelist: ['token', 'usuario', 'isAuthenticated'],
+};
+
 const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: persistReducer(authPersistConfig, authReducer),
     carrito: carritoReducer,
     favoritos: favoritosReducer,
     ui: uiReducer,
@@ -18,29 +35,13 @@ const store = configureStore({
     [ecommerceApi.reducerPath]: ecommerceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(ecommerceApi.middleware),
+    getDefaultMiddleware({
+      // redux-persist usa acciones no serializables internamente
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(ecommerceApi.middleware),
 });
 
-store.subscribe(() => {
-  const { auth, carrito, favoritos, ui, perfil, ordenes } = store.getState();
-
-  // Persistencia de Auth
-  if (auth.token && auth.usuario) {
-    localStorage.setItem('token', auth.token);
-    localStorage.setItem('usuario', JSON.stringify(auth.usuario));
-  } else {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-  }
-
-  // Persistencia de Carrito (solo en BD ahora, pero mantenemos caché local opcional)
-  localStorage.setItem('cartItems', JSON.stringify(carrito.items));
-
-  // Persistencia de Favoritos (solo en BD ahora, pero mantenemos caché local opcional)
-  localStorage.setItem('favoriteItems', JSON.stringify(favoritos.items));
-
-  // Persistencia de UI
-  localStorage.setItem('uiState', JSON.stringify(ui));
-});
-
+export const persistor = persistStore(store);
 export default store;
