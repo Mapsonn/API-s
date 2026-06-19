@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce1
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build: ./e-commerce1
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PASSWORD: root
+      DDL_AUTO: update
+    volumes:
+      - ./e-commerce1/imagenes:/app/imagenes
+      - ./e-commerce1/uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

@@ -1,0 +1,20 @@
+# Maven build
+e-commerce1/target/
+
+# Node
+frontend/e-commerce-frontend/node_modules/
+
+# Environment
+.env
+*.env
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
