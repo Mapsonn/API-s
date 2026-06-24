@@ -107,3 +107,11 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+body.dark-mode {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+body.dark-mode img {
+  filter: invert(1) hue-rotate(180deg);
+}

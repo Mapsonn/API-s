@@ -18,9 +18,16 @@ import ProtectedRoute from './components/ProtectedRoute'
 function App() {
   const dispatch = useDispatch()
   const usuario = useSelector((state) => state.auth.usuario)
+  const theme = useSelector((state) => state.ui.theme)
 
-  // Al cargar la app (o hacer F5), si el usuario ya está autenticado
-  // (restaurado por redux-persist), carga su carrito desde la BD
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+  }, [theme])
+
   useEffect(() => {
     if (usuario?.id) {
       dispatch(fetchCarrito(usuario.id))

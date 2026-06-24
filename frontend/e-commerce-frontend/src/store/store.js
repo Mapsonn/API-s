@@ -17,8 +17,6 @@ import authReducer from './authSlice';
 import carritoReducer from './carritoSlice';
 import favoritosReducer from './favoritosSlice';
 import uiReducer from './uiSlice';
-import perfilReducer from './perfilSlice';
-import ordenesReducer from './ordenesSlice';
 import { ecommerceApi } from './api/ecommerceApi';
 
 const authPersistConfig = {
@@ -45,8 +43,6 @@ const store = configureStore({
     carrito:   persistReducer(carritoPersistConfig,   carritoReducer),
     favoritos: persistReducer(favoritosPersistConfig, favoritosReducer),
     ui: uiReducer,
-    perfil: perfilReducer,
-    ordenes: ordenesReducer,
     [ecommerceApi.reducerPath]: ecommerceApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -1,15 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Package, PlusCircle, User, LogOut, ShoppingCart, Shield } from 'lucide-react';
+import { Heart, Package, PlusCircle, User, LogOut, ShoppingCart, Shield, Moon, Sun } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/authSlice';
 import { limpiarCarrito } from '../store/carritoSlice';
 import { limpiarFavoritos } from '../store/favoritosSlice';
+import { cambiarTema } from '../store/uiSlice';
 import { useGetCarritoQuery } from '../store/api/ecommerceApi';
 
 function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const usuario = useSelector((state) => state.auth.usuario);
+  const theme = useSelector((state) => state.ui.theme);
   const cantidadFavoritos = useSelector((state) => state.favoritos.items.length);
   const cantidadCarritoLocal = useSelector((state) => state.carrito.items.length);
   const { data: itemsCarritoBackend = [] } = useGetCarritoQuery(usuario?.id, {
@@ -70,6 +72,15 @@ function Navbar() {
           </>
         )}
 
+        {/* MODO OSCURO */}
+        <button
+          onClick={() => dispatch(cambiarTema(theme === 'dark' ? 'light' : 'dark'))}
+          style={themeBtnStyle}
+          title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+        >
+          {theme === 'dark' ? <Sun size={18} strokeWidth={1.5} color="#c4a457" /> : <Moon size={18} strokeWidth={1.5} />}
+        </button>
+
         {/* CARRITO RESALTADO */}
         <Link to="/carrito" style={cartLinkStyle}>
           <ShoppingCart size={20} strokeWidth={1.5} color="#c4a457" />
@@ -122,6 +133,17 @@ const cartLinkStyle = {
 };
 
 const cartCountStyle = { color: '#c4a457', marginLeft: '4px' };
+
+const themeBtnStyle = {
+  backgroundColor: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  padding: '6px',
+  opacity: 0.85,
+  color: '#f9f9f9',
+};
 
 const logoutBtnStyle = {
   backgroundColor: 'transparent',
