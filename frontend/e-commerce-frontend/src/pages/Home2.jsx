@@ -34,10 +34,12 @@ function Home2() {
     document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const productosFiltrados = (productos || []).filter(p =>
-    p?.nombre?.toLowerCase().includes(busqueda.toLowerCase()) &&
-    (!usuarioActual || p.usuarioId !== usuarioActual.id)
-  );
+  const productosFiltrados = (productos || [])
+    .filter(p =>
+      p?.nombre?.toLowerCase().includes(busqueda.toLowerCase()) &&
+      (!usuarioActual || p.usuarioId !== usuarioActual.id)
+    )
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
 
   // Toma las primeras 3 fotos reales del catálogo para el hero
   const fotosHero = productos.slice(0, 3);
@@ -200,6 +202,9 @@ function Home2() {
                       >
                         <Heart size={20} fill={isFavorite(p.id) ? '#c4a457' : 'none'} />
                       </button>
+                      {p.stock === 0 && (
+                        <div style={sinStockBadgeStyle}>Sin stock</div>
+                      )}
                       <img
                         src={p.imagenesUrl?.[0] ? `http://localhost:8080/imagenes/${p.imagenesUrl[0]}` : 'https://placehold.co/300?text=SIN+IMAGEN'}
                         alt={p.nombre}
@@ -281,6 +286,7 @@ const imgContainer = { width: '100%', height: '240px', overflow: 'hidden', borde
 const imgStyle = { width: '100%', height: '100%', objectFit: 'cover',objectPosition: 'center top', display: 'block'};
 const heartBtnStyle = { position: 'absolute', top: '14px', right: '14px', zIndex: 2, width: '42px', height: '42px', borderRadius: '50%', border: '1px solid rgba(37, 28, 24, 0.12)', backgroundColor: 'rgba(255, 255, 255, 0.92)', color: '#251c18', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const heartBtnActiveStyle = { ...heartBtnStyle, color: '#c4a457', border: '1px solid rgba(196, 164, 87, 0.45)' };
+const sinStockBadgeStyle = { position: 'absolute', bottom: '10px', left: '10px', zIndex: 2, backgroundColor: 'rgba(37,28,24,0.82)', color: '#f5f0e8', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase', padding: '4px 10px', borderRadius: '3px' };
 const catLabelStyle = { fontSize: '12px', color: '#c4a457', fontWeight: '600', textTransform: 'uppercase' };
 const productNameStyle = { fontSize: '1.6rem', margin: '5px 0', color: '#251c18', fontWeight: '400', fontFamily: "'Playfair Display', serif" };
 const priceStyle = { fontSize: '1.1rem', color: '#c9a84c', marginTop: '8px', fontWeight: '500', letterSpacing: '1px', fontFamily: "'Playfair Display', serif" };

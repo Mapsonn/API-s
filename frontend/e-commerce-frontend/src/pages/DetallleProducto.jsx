@@ -104,11 +104,21 @@ function DetallleProducto() {
             </div>
           </div>
 
+          {p.stock === 0 && (
+            <div style={sinStockStyle}>Sin stock disponible</div>
+          )}
+
           <div style={buttonRow}>
-            <button style={buyBtnStyle} onClick={manejarClick}>
-              <span style={btnTextStyle}>Agregar al carrito</span>
+            <button
+              style={p.stock === 0 ? buyBtnDisabledStyle : buyBtnStyle}
+              onClick={manejarClick}
+              disabled={p.stock === 0}
+            >
+              <span style={btnTextStyle}>
+                {p.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
+              </span>
             </button>
-            
+
             <Link to="/" style={backLinkStyle}>
               <ArrowLeft size={16} /> Volver al catálogo
             </Link>
@@ -270,14 +280,33 @@ const qtyDisplay = {
 
 const buttonRow = { display: 'flex', flexDirection: 'column', gap: '30px', alignItems: 'flex-start' };
 
-const buyBtnStyle = { 
-  padding: '20px 50px', 
-  backgroundColor: '#251c18', 
-  color: '#f9f9f9', 
-  border: 'none', 
+const sinStockStyle = {
+  padding: '12px 20px',
+  backgroundColor: 'rgba(192, 57, 43, 0.08)',
+  border: '1px solid rgba(192, 57, 43, 0.3)',
+  borderRadius: '4px',
+  color: '#c0392b',
+  fontFamily: "'Playfair Display', serif",
+  fontSize: '1rem',
+  letterSpacing: '1px',
+  textTransform: 'uppercase',
+  marginBottom: '10px',
+};
+
+const buyBtnStyle = {
+  padding: '20px 50px',
+  backgroundColor: '#251c18',
+  color: '#f9f9f9',
+  border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
   transition: '0.3s'
+};
+
+const buyBtnDisabledStyle = {
+  ...buyBtnStyle,
+  backgroundColor: 'rgba(37,28,24,0.25)',
+  cursor: 'not-allowed',
 };
 
 const btnTextStyle = {

@@ -9,7 +9,7 @@ function CrearProducto() {
   const [precio, setPrecio] = useState('');
   const [stock, setStock] = useState('');
   const [categoriaId, setCategoriaId] = useState('');
-  const [imagen, setImagen] = useState(null);
+  const [imagenes, setImagenes] = useState([]);
   const { data: categoriasApi = [] } = useGetCategoriasQuery();
   
   const navigate = useNavigate();
@@ -33,9 +33,7 @@ function CrearProducto() {
     formData.append('categoriaId', categoriaId);
     formData.append('usuarioId', usuarioReal.id); 
 
-    if (imagen) {
-      formData.append('imagenes', imagen);
-    }
+    imagenes.forEach(img => formData.append('imagenes', img));
 
     try {
       await crearProducto(formData).unwrap();
@@ -126,12 +124,19 @@ function CrearProducto() {
 
           <div style={fileContainer}>
             <label style={labelStyle}>Imagen del producto</label>
-            <input 
-              type="file" 
+            <input
+              type="file"
+              multiple
+              accept="image/*"
               style={fileInput}
-              onChange={(e) => setImagen(e.target.files[0])} 
-              required 
+              onChange={(e) => setImagenes(Array.from(e.target.files))}
+              required
             />
+            {imagenes.length > 0 && (
+              <p style={{ margin: '8px 0 0', fontSize: '0.85rem', color: '#c9a84c' }}>
+                {imagenes.length} {imagenes.length === 1 ? 'imagen seleccionada' : 'imágenes seleccionadas'}
+              </p>
+            )}
           </div>
 
           <button type="submit" style={btnPublishStyle} disabled={isLoading}>
