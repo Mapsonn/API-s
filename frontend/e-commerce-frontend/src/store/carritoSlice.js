@@ -3,9 +3,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // Async Thunks para sincronizar con la BD
 export const fetchCarrito = createAsyncThunk(
   'carrito/fetchCarrito',
-  async (usuarioId, { rejectWithValue }) => {
+  async (usuarioId, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/${usuarioId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -21,9 +21,9 @@ export const fetchCarrito = createAsyncThunk(
 
 export const agregarAlCarritoAsync = createAsyncThunk(
   'carrito/agregarAlCarrito',
-  async ({ usuarioId, productoId, cantidad }, { rejectWithValue }) => {
+  async ({ usuarioId, productoId, cantidad }, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getState().auth.token;
       const response = await fetch(
         `http://localhost:8080/api/carrito/agregar?usuarioId=${usuarioId}&productoId=${productoId}&cantidad=${cantidad}`,
         {
@@ -49,9 +49,9 @@ export const agregarAlCarritoAsync = createAsyncThunk(
 
 export const eliminarDelCarritoAsync = createAsyncThunk(
   'carrito/eliminarDelCarrito',
-  async ({ itemId, usuarioId }, { rejectWithValue }) => {
+  async ({ itemId, usuarioId }, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/eliminar/${itemId}`, {
         method: 'DELETE',
         headers: {
@@ -74,9 +74,9 @@ export const eliminarDelCarritoAsync = createAsyncThunk(
 
 export const vaciarCarritoAsync = createAsyncThunk(
   'carrito/vaciarCarrito',
-  async (usuarioId, { rejectWithValue }) => {
+  async (usuarioId, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/vaciar/${usuarioId}`, {
         method: 'DELETE',
         headers: {
