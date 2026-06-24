@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Thunk: LoginJWT.jsx llama a loginUser(credentials)
-// authSlice hace la llamada al endpoint y maneja los estados async
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { rejectWithValue }) => {
@@ -14,14 +12,13 @@ export const loginUser = createAsyncThunk(
       if (!response.ok) {
         return rejectWithValue('Email o contraseña incorrectos.');
       }
-      return await response.json(); // { token, id, nombre, apellido, role }
+      return await response.json();
     } catch {
       return rejectWithValue('Error de conexión con el servidor.');
     }
   }
 );
 
-// El estado inicial es vacío — redux-persist rehidrata desde sessionStorage al hacer F5
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -46,12 +43,10 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // pending → isLoading=true, limpia error anterior
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      // fulfilled → guarda token y usuario, isAuthenticated=true
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.token = action.payload.token;
@@ -65,7 +60,6 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.error = null;
       })
-      // rejected → muestra error
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;

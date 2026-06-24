@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// El estado inicial es vacío — redux-persist rehidrata desde sessionStorage al hacer F5
 const favoritosSlice = createSlice({
   name: 'favoritos',
   initialState: {

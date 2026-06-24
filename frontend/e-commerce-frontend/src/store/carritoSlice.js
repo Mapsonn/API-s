@@ -1,15 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Async Thunks para sincronizar con la BD
 export const fetchCarrito = createAsyncThunk(
   'carrito/fetchCarrito',
   async (usuarioId, { rejectWithValue, getState }) => {
     try {
       const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/${usuarioId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Error al cargar carrito');
       return await response.json();
@@ -28,17 +25,12 @@ export const agregarAlCarritoAsync = createAsyncThunk(
         `http://localhost:8080/api/carrito/agregar?usuarioId=${usuarioId}&productoId=${productoId}&cantidad=${cantidad}`,
         {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
         }
       );
       if (!response.ok) throw new Error('Error al agregar al carrito');
-      // Después de agregar, recargar el carrito
       const carritoResponse = await fetch(`http://localhost:8080/api/carrito/${usuarioId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       return await carritoResponse.json();
     } catch (error) {
@@ -54,16 +46,11 @@ export const eliminarDelCarritoAsync = createAsyncThunk(
       const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/eliminar/${itemId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Error al eliminar del carrito');
-      // Recargar el carrito actualizado
       const carritoResponse = await fetch(`http://localhost:8080/api/carrito/${usuarioId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       return await carritoResponse.json();
     } catch (error) {
@@ -79,16 +66,11 @@ export const vaciarCarritoAsync = createAsyncThunk(
       const token = getState().auth.token;
       const response = await fetch(`http://localhost:8080/api/carrito/vaciar/${usuarioId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Error al vaciar carrito');
-      // Recargar el carrito actualizado (vacío)
       const carritoResponse = await fetch(`http://localhost:8080/api/carrito/${usuarioId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       return await carritoResponse.json();
     } catch (error) {
@@ -113,7 +95,6 @@ const carritoSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Fetch Carrito
     builder
       .addCase(fetchCarrito.pending, (state) => {
         state.loading = true;
@@ -128,7 +109,6 @@ const carritoSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Agregar al Carrito
     builder
       .addCase(agregarAlCarritoAsync.pending, (state) => {
         state.loading = true;
@@ -143,7 +123,6 @@ const carritoSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Eliminar del Carrito
     builder
       .addCase(eliminarDelCarritoAsync.pending, (state) => {
         state.loading = true;
@@ -158,7 +137,6 @@ const carritoSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Vaciar Carrito
     builder
       .addCase(vaciarCarritoAsync.pending, (state) => {
         state.loading = true;
@@ -176,5 +154,4 @@ const carritoSlice = createSlice({
 });
 
 export const { limpiarError, limpiarCarrito } = carritoSlice.actions;
-
 export default carritoSlice.reducer;

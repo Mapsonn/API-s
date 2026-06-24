@@ -4,20 +4,18 @@ import {
   persistReducer,
   FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
 } from 'redux-persist';
-
-// sessionStorage: sobrevive F5 pero se borra al cerrar la pestaña.
-// Mitiga XSS vs localStorage: no persiste entre pestañas ni sesiones.
-const sessionStorageEngine = {
-  getItem:    (key)        => Promise.resolve(sessionStorage.getItem(key)),
-  setItem:    (key, value) => Promise.resolve(sessionStorage.setItem(key, value)),
-  removeItem: (key)        => Promise.resolve(sessionStorage.removeItem(key)),
-};
-
 import authReducer from './authSlice';
 import carritoReducer from './carritoSlice';
 import favoritosReducer from './favoritosSlice';
 import uiReducer from './uiSlice';
 import { ecommerceApi } from './api/ecommerceApi';
+
+// sessionStorage sobrevive F5 pero se borra al cerrar la pestana - menor exposicion XSS que localStorage
+const sessionStorageEngine = {
+  getItem:    (key)        => Promise.resolve(sessionStorage.getItem(key)),
+  setItem:    (key, value) => Promise.resolve(sessionStorage.setItem(key, value)),
+  removeItem: (key)        => Promise.resolve(sessionStorage.removeItem(key)),
+};
 
 const authPersistConfig = {
   key: 'auth',

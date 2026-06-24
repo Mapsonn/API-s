@@ -9,11 +9,8 @@ function LoginJWT() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Suscripto a los estados del authSlice → se re-renderiza cuando cambian
   const { isAuthenticated, isLoading, error } = useSelector((state) => state.auth);
 
-  // isAuthenticated=true → redirige al Home
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
@@ -22,8 +19,6 @@ function LoginJWT() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Llama a authSlice.loginUser con las credenciales
-    // loginUser maneja la llamada al endpoint y los estados pending/fulfilled/rejected
     dispatch(loginUser({ email, password }))
       .then((result) => {
         if (loginUser.fulfilled.match(result)) {
@@ -54,10 +49,7 @@ function LoginJWT() {
             style={inputStyle}
           />
 
-          {/* isLoading=true → spinner */}
           {isLoading && <p style={spinnerStyle}>Iniciando sesión...</p>}
-
-          {/* error!=null → mostrar error */}
           {error && <p style={errorStyle}>{error}</p>}
 
           <button type="submit" style={btnStyle} disabled={isLoading}>

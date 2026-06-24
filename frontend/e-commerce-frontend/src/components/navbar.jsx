@@ -28,12 +28,10 @@ function Navbar() {
 
   return (
     <nav style={navContainerStyle}>
-      {/* 1. LOGO */}
       <div style={logoWrapperStyle} onClick={() => navigate('/')}>
         <img src="/image-removebg-preview.png" alt="Estudio 40" style={logoImgStyle} />
       </div>
 
-      {/* 2. MENU CON ICONOS */}
       <div style={menuStyle}>
         
         {usuario ? (
@@ -91,8 +89,6 @@ function Navbar() {
   );
 }
 
-// --- ESTILOS REFINADOS ---
-
 const navContainerStyle = { 
   backgroundColor: '#251c18', 
   color: '#f9f9f9', 
@@ -111,16 +107,16 @@ const logoImgStyle = { height: '45px', width: 'auto' };
 
 const menuStyle = { display: 'flex', gap: '30px', alignItems: 'center' };
 
-const linkStyle = { 
-  color: '#f9f9f9', 
-  textDecoration: 'none', 
+const linkStyle = {
+  color: '#f9f9f9',
+  textDecoration: 'none',
   fontSize: '0.95rem',
   fontWeight: '400',
-  display: 'flex', // Para alinear icono y texto
+  display: 'flex',
   alignItems: 'center',
-  gap: '8px', // Espacio entre icono y texto
+  gap: '8px',
   transition: '0.3s',
-  opacity: 0.85
+  opacity: 0.85,
 };
 
 const userNameStyle = { color: '#c4a457', fontWeight: '600' };

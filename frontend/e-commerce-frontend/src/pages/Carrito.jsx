@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { eliminarDelCarritoAsync, vaciarCarritoAsync, fetchCarrito } from '../store/carritoSlice';
+import { eliminarDelCarritoAsync, vaciarCarritoAsync } from '../store/carritoSlice';
 import {
   useCheckoutCarritoMutation,
   useGetCarritoQuery,
@@ -11,9 +11,7 @@ function Carrito() {
   const dispatch = useDispatch();
   const usuario = useSelector((state) => state.auth.usuario);
   const items = useSelector((state) => state.carrito.items);
-  const { data: itemsBackend = [] } = useGetCarritoQuery(usuario?.id, {
-    skip: !usuario,
-  });
+  useGetCarritoQuery(usuario?.id, { skip: !usuario });
   const [checkoutCarrito] = useCheckoutCarritoMutation();
 
   const total = items.reduce((acc, item) => acc + (item.precio * (item.cantidadElegida || 1)), 0);
@@ -21,7 +19,6 @@ function Carrito() {
   const finalizarCompra = async () => {
     if (items.length === 0) return;
 
-    // VALIDACIÓN: Si no hay usuario, no permite avanzar
     if (!usuario) {
       alert("Debes iniciar sesión para realizar la compra.");
       navigate('/login');
@@ -99,7 +96,6 @@ function Carrito() {
                 <h2 style={totalAmount}>${total.toLocaleString()}</h2>
               </div>
 
-              {/* LÓGICA DE BOTÓN: Cambia el texto si no está logueado */}
               <button onClick={finalizarCompra} style={btnFinalizarStyle}>
                 <span style={btnTextInner}>
                   {usuario ? "Finalizar Compra" : "Iniciá sesión para comprar"}
@@ -127,7 +123,6 @@ function Carrito() {
   );
 }
 
-// --- ESTILOS "ESTUDIO 40" CARRITO ---
 const pageBackground = { padding: '80px 0', minHeight: '100vh', backgroundColor: '#f5f0e8' };
 const titleStyle = { textAlign: 'center', fontSize: '3.5rem', marginBottom: '50px', color: '#251c18', fontFamily: "'Playfair Display', serif", fontWeight: '400' };
 const containerStyle = { maxWidth: '800px', margin: '0 auto', padding: '40px', backgroundColor: 'white', borderRadius: '4px', boxShadow: '0 10px 30px rgba(37, 28, 24, 0.05)' };

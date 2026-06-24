@@ -113,7 +113,6 @@ function CrearProducto() {
               value={categoriaId}
             >
               <option value="">Seleccionar Categoría</option>
-              {/* CORRECCIÓN: Renderizado seguro con validación de array */}
               {Array.isArray(categoriasApi) && categoriasApi.map(cat => (
                 <option key={cat.id} value={cat.id}>
                   {cat.nombreCategoria || cat.nombre}
@@ -148,7 +147,6 @@ function CrearProducto() {
   );
 }
 
-// ... (Tus estilos se mantienen iguales)
 const pageBackground = { padding: '80px 0', minHeight: '100vh', backgroundColor: '#efefef' };
 const titleStyle = { textAlign: 'center', fontSize: '3.5rem', marginBottom: '50px', color: '#251c18', fontFamily: "'Playfair Display', serif", fontWeight: '400' };
 const containerStyle = { maxWidth: '700px', margin: '0 auto', padding: '50px', backgroundColor: '#f5f0e8', borderRadius: '40px', boxShadow: '0 15px 35px rgba(37, 28, 24, 0.08)' };
