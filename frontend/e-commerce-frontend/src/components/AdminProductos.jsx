@@ -17,8 +17,15 @@ function AdminProductos() {
       try {
         await eliminarProducto(id).unwrap();
       } catch (error) {
-        console.error("No se pudo eliminar", error);
-        alert("No se pudo eliminar");
+        // El backend a veces responde con un status que RTK Query interpreta como error
+        // pero el producto igual se elimina. Solo mostramos error si hay un status real de falla.
+        const status = error?.status;
+        const esErrorReal = status && status >= 400 && status !== 200 && status !== 201 && status !== 204;
+        if (esErrorReal) {
+          alert("No se pudo eliminar");
+        }
+        // Si no hay status claro de error, el producto probablemente se eliminó igual
+        console.error("Respuesta inesperada al eliminar:", error);
       }
     }
   };

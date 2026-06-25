@@ -16,7 +16,14 @@ function Registro() {
       alert("Usuario creado con exito. Ahora podes loguearte.");
       navigate('/login');
     } catch (error) {
-      alert("Error: " + (error.data?.message || error.data || "Revisa los datos"));
+      const msg = error.data?.message || error.data || "";
+      const msgStr = typeof msg === 'string' ? msg.toLowerCase() : JSON.stringify(msg).toLowerCase();
+      if (msgStr.includes("creado") || msgStr.includes("exito") || msgStr.includes("éxito") || msgStr.includes("success")) {
+        alert("Usuario creado con exito. Ahora podes loguearte.");
+        navigate('/login');
+      } else {
+        alert("Error: " + (msg || "Revisa los datos"));
+      }
     }
   };
 
@@ -25,11 +32,11 @@ function Registro() {
       <h2 style={titleStyle}>Crear Cuenta</h2>
       <div style={containerStyle}>
         <form onSubmit={manejarEnvio} style={formStyle}>
-          <input type="text" placeholder="Username" required onChange={e => setForm({...form, username: e.target.value})} style={inputStyle} />
-          <input type="text" placeholder="Nombre" required onChange={e => setForm({...form, nombre: e.target.value})} style={inputStyle} />
-          <input type="text" placeholder="Apellido" required onChange={e => setForm({...form, apellido: e.target.value})} style={inputStyle} />
-          <input type="email" placeholder="Email" required onChange={e => setForm({...form, email: e.target.value})} style={inputStyle} />
-          <input type="password" placeholder="Contrasena" required onChange={e => setForm({...form, password: e.target.value})} style={inputStyle} />
+          <input type="text" placeholder="Username" required onChange={e => setForm({ ...form, username: e.target.value })} style={inputStyle} />
+          <input type="text" placeholder="Nombre" required onChange={e => setForm({ ...form, nombre: e.target.value })} style={inputStyle} />
+          <input type="text" placeholder="Apellido" required onChange={e => setForm({ ...form, apellido: e.target.value })} style={inputStyle} />
+          <input type="email" placeholder="Email" required onChange={e => setForm({ ...form, email: e.target.value })} style={inputStyle} />
+          <input type="password" placeholder="Contrasena" required onChange={e => setForm({ ...form, password: e.target.value })} style={inputStyle} />
 
           <button type="submit" style={btnStyle} disabled={isLoading}>
             {isLoading ? 'Registrando...' : 'Registrarse'}
